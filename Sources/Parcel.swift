@@ -72,6 +72,15 @@ struct ParcelEvent: Identifiable, Codable {
     let station: String?
     let eta: String?
     let status: ParcelStatus
+    let service: String?
+    var serviceLabel: String {
+        switch service {
+        case "SMS": return "短信"
+        case "RCS": return "RCS"
+        case "iMessage": return "iMessage"
+        default: return "历史记录未注明"
+        }
+    }
 }
 struct Parcel: Identifiable {
     let id: String
@@ -111,7 +120,7 @@ struct ParcelParser {
               let range = Range(result.range(at: result.numberOfRanges > 1 ? 1 : 0), in: text) else { return nil }
         return String(text[range]).trimmingCharacters(in: .whitespacesAndNewlines)
     }
-    static func parse(id: Int64, date: Date, sender: String, body: String) -> ParcelEvent? {
+    static func parse(id: Int64, date: Date, sender: String, body: String, service: String? = nil) -> ParcelEvent? {
         // 验证码与广告不当作物流进度。
         if body.contains("验证码") || body.contains("校验码") || body.contains("登录密码") { return nil }
         let brands = ["顺丰", "中通", "圆通", "申通", "韵达", "极兔", "京东物流", "京东快递", "邮政", "EMS", "德邦", "菜鸟", "丰巢", "兔喜", "妈妈驿站", "快递超市"]
@@ -133,7 +142,7 @@ struct ParcelParser {
         else if body.range(of: "运输|在途|转运|离开|发往|到达", options: .regularExpression) != nil { status = .transit }
         let station = match("(?:已存入|已放在|已放至|已放入|已到达|已送达|请到|请至|到达)\\s*([^，。；！\\n]{2,50}(?:驿站|快递柜|快递超市|代收点|服务站))", body)
         let eta = match("((?:预计|预计于|将于)[^，。；！\\n]{1,45}(?:送达|上门|到达))", body)
-        return ParcelEvent(id: id, date: date, sender: sender, body: body, carrier: carrier, tracking: tracking, code: code, station: station, eta: eta, status: status)
+        return ParcelEvent(id: id, date: date, sender: sender, body: body, carrier: carrier, tracking: tracking, code: code, station: station, eta: eta, status: status, service: service)
     }
     static func group(_ events: [ParcelEvent]) -> [Parcel] {
         let groups = Dictionary(grouping: events) { event in event.tracking.map { "tracking:\($0.uppercased())" } ?? "sms:\(event.id)" }

@@ -1,4 +1,5 @@
 import Foundation
+import Combine
 import SQLite3
 
 struct InboxRead {
@@ -10,14 +11,14 @@ enum InboxFailure: LocalizedError {
     case access, incompatible
     var errorDescription: String? {
         switch self {
-        case .access: return "无法读取本机短信。请在“系统设置 → 隐私与安全性 → 完全磁盘访问权限”中添加并允许“快递短信助手”，然后退出并重新打开应用。"
+        case .access: return "无法读取本机信息。请在“系统设置 → 隐私与安全性 → 完全磁盘访问权限”中添加并允许“快递短信助手”，然后退出并重新打开应用。"
         case .incompatible: return "当前“信息”数据库格式不兼容，尚未读取短信。"
         }
     }
 }
 struct InboxReader {
-    static func read() throws -> InboxRead {
-        let path = NSHomeDirectory() + "/Library/Messages/chat.db"
+    static func read(databaseURL: URL = URL(fileURLWithPath:NSHomeDirectory()).appendingPathComponent("Library/Messages/chat.db"), now: Date = Date()) throws -> InboxRead {
+        let path = databaseURL.path
         var db: OpaquePointer?
         guard sqlite3_open_v2(path, &db, SQLITE_OPEN_READONLY | SQLITE_OPEN_FULLMUTEX, nil) == SQLITE_OK, let database = db else {
             if let db { sqlite3_close(db) }; throw InboxFailure.access
@@ -27,14 +28,14 @@ struct InboxReader {
         // 只读，不复制数据库、不修改短信或已读状态。
         var statement: OpaquePointer?
         let sql = """
-        SELECT m.ROWID, m.date, m.text, m.attributedBody, h.id
+        SELECT m.ROWID, m.date, m.text, m.attributedBody, h.id, m.service
         FROM message m LEFT JOIN handle h ON m.handle_id = h.ROWID
-        WHERE m.is_from_me = 0 AND m.date > ? AND m.service IN ('SMS', 'RCS')
+        WHERE m.is_from_me = 0 AND m.date > ? AND m.service IN ('SMS', 'RCS', 'iMessage')
         ORDER BY m.date DESC LIMIT 5000
         """
         guard sqlite3_prepare_v2(database, sql, -1, &statement, nil) == SQLITE_OK else { throw InboxFailure.incompatible }
         defer { sqlite3_finalize(statement) }
-        let cutoff = Date().addingTimeInterval(-90*24*3600).timeIntervalSinceReferenceDate * 1_000_000_000
+        let cutoff = now.addingTimeInterval(-90*24*3600).timeIntervalSinceReferenceDate * 1_000_000_000
         sqlite3_bind_double(statement, 1, cutoff)
         var events: [ParcelEvent] = []; var scanned = 0; var unreadable = 0
         var step = sqlite3_step(statement)
@@ -47,8 +48,9 @@ struct InboxReader {
                 else { unreadable += 1 }
             }
             let sender = sqlite3_column_text(statement, 4).map { String(cString:$0) } ?? "未知号码"
+            let service = sqlite3_column_text(statement, 5).map { String(cString:$0) }
             let date = Date(timeIntervalSinceReferenceDate: sqlite3_column_double(statement, 1) / 1_000_000_000)
-            if let event = ParcelParser.parse(id:sqlite3_column_int64(statement,0),date:date,sender:sender,body:text) { events.append(event) }
+            if let event = ParcelParser.parse(id:sqlite3_column_int64(statement,0),date:date,sender:sender,body:text,service:service) { events.append(event) }
             step = sqlite3_step(statement)
         }
         guard step == SQLITE_DONE else { throw InboxFailure.access }
@@ -60,7 +62,7 @@ struct InboxReader {
     @Published var error: String?
     @Published var lastRefresh: Date?
     @Published var busy = false
-    @Published var coverage = "读取最近90天、最多5000条收到的短信；仅保留识别到的快递通知。"
+    @Published var coverage = "读取最近90天、最多5000条收到的信息（短信、RCS、iMessage）；仅保留识别到的快递通知。"
     @Published var autoRefresh = false
     @Published var started = false
     @Published var ledger = ReceiptLedger()
@@ -98,7 +100,7 @@ struct InboxReader {
             parcels = candidate.reconcile(read.events)
             do { try persist(candidate); ledger = candidate; archiveError = nil } catch { archiveError = "归档保存失败：\(error.localizedDescription)" }
             error = nil; lastRefresh = Date()
-            coverage = "已检查最近90天内 \(read.scanned) 条短信；识别出 \(read.events.count) 条快递通知。\(read.scanned == 5000 ? "已达到5000条上限，更早短信未读取。" : "")\(read.unreadable > 0 ? "其中 \(read.unreadable) 条短信的正文格式暂不支持，可能漏掉通知。" : "")"
+            coverage = "已检查最近90天内 \(read.scanned) 条信息（短信、RCS、iMessage）；识别出 \(read.events.count) 条快递通知。\(read.scanned == 5000 ? "已达到5000条上限，更早信息未读取。" : "")\(read.unreadable > 0 ? "其中 \(read.unreadable) 条信息的正文格式暂不支持，可能漏掉通知。" : "")"
             autoRefresh = true
         } catch { self.error = error.localizedDescription; autoRefresh = false }
         busy = false

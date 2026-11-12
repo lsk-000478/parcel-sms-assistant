@@ -45,7 +45,7 @@ struct ContentView: View {
         NavigationSplitView {
             VStack(alignment:.leading,spacing:16) {
                 Label("快递短信助手",systemImage:"shippingbox.fill").font(.title2.bold()).padding(.top)
-                Text("从短信中找到你的包裹").foregroundStyle(.secondary).font(.caption)
+                Text("支持短信、RCS 与 iMessage").foregroundStyle(.secondary).font(.caption)
                 ForEach(["进行中","待取件","配送到家","寄出 / 运输","已收货归档","全部通知"], id:\.self) { item in
                     Button { filter=item; selection=nil } label: {
                         HStack { Text(item); Spacer(); if item == "已收货归档" { Text("\(store.parcels.filter { store.ledger.isReceived($0) }.count)") } else if item == "进行中" { Text("\(store.parcels.filter { !store.ledger.isReceived($0) }.count)") } }
@@ -102,7 +102,7 @@ struct ContentView: View {
                 field("取件地点",p.latest.station ?? "请查看下方原短信")
                 if p.latest.tracking == nil { Text("此通知缺少完整运单号，暂未与其他短信合并。").font(.callout).foregroundStyle(.secondary) }
                 Divider(); Text("短信时间线").font(.headline)
-                ForEach(p.events) { e in VStack(alignment:.leading,spacing:10) { HStack { Text(e.status.rawValue).bold(); Spacer(); Text(e.date.formatted(date:.abbreviated,time:.shortened)).font(.caption).foregroundStyle(.secondary) }; Text(e.body).textSelection(.enabled); Text("短信来源：\(e.sender)").font(.caption).foregroundStyle(.secondary) }.padding().frame(maxWidth:.infinity,alignment:.leading).background(Color(nsColor:.controlBackgroundColor)).clipShape(RoundedRectangle(cornerRadius:10)) }
+                ForEach(p.events) { e in VStack(alignment:.leading,spacing:10) { HStack { Text(e.status.rawValue).bold(); Spacer(); Text(e.date.formatted(date:.abbreviated,time:.shortened)).font(.caption).foregroundStyle(.secondary) }; Text(e.body).textSelection(.enabled); Text("消息类型：\(e.serviceLabel) · 来源：\(e.sender)").font(.caption).foregroundStyle(.secondary) }.padding().frame(maxWidth:.infinity,alignment:.leading).background(Color(nsColor:.controlBackgroundColor)).clipShape(RoundedRectangle(cornerRadius:10)) }
             }.padding(28) } } else { VStack(spacing:14) { Image(systemName:"text.bubble").font(.system(size:48)).foregroundStyle(.teal); Text("选择一条快递通知").font(.title2); Text("查看取件码、原短信及包裹进度").foregroundStyle(.secondary) }.frame(maxWidth:.infinity,maxHeight:.infinity) }
         }.frame(minWidth:1000,minHeight:650).task { while !Task.isCancelled { do { try await Task.sleep(for:.seconds(60)) } catch { break }; if store.autoRefresh { await store.refresh() } } }
     }
