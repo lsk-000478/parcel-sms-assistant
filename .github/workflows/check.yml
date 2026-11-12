@@ -1,0 +1,17 @@
+name: Check Mac app
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Test parsing, platform clues and receipt archive
+        run: bash test.command
+      - name: Build Apple Silicon app
+        run: APP_OUTPUT_DIR="$PWD/.build/release" bash build.command

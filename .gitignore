@@ -1,0 +1,11 @@
+.DS_Store
+.build/
+*.app/
+dist/
+展示资料/
+*.db
+*.db-*
+receipts.json
+*.log
+.env
+.env.*

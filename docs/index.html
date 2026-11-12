@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="在 Mac 本地整理快递短信，查看取件码、配送状态与收货归档。">
+  <title>快递短信助手 · Mac 下载与使用</title>
+  <style>
+    :root{color-scheme:light;--ink:#152b39;--muted:#52646c;--teal:#087d75;--line:#dbe5e7;--paper:#f4f7f6}
+    *{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif;line-height:1.75}
+    main{max-width:1000px;margin:auto;padding:40px 28px 64px}nav{display:flex;align-items:center;justify-content:space-between;gap:16px;font-size:14px}a{color:var(--teal);text-underline-offset:4px}nav a{text-decoration:none}
+    header{padding:72px 0 48px;max-width:810px}.eyebrow{color:var(--teal);font-weight:650;font-size:14px;letter-spacing:.08em}h1{font-size:clamp(34px,5vw,58px);line-height:1.2;letter-spacing:-.03em;margin:16px 0 22px}header p{font-size:19px;color:var(--muted);max-width:690px}h2{font-size:27px;line-height:1.4;margin:0 0 24px}h3{font-size:18px;margin:0 0 8px}p{margin:0 0 16px}.actions{display:flex;flex-wrap:wrap;gap:12px;margin:28px 0 16px}.button{display:inline-flex;padding:12px 20px;border:1px solid var(--teal);border-radius:9px;text-decoration:none;font-weight:600}.primary{color:white;background:var(--teal)}.small{font-size:13px;color:var(--muted)}
+    section{padding:36px 0;border-top:1px solid var(--line)}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}.feature{padding:24px;background:white;border:1px solid var(--line);border-radius:12px}.feature p{color:var(--muted);font-size:15px;margin:0}ol{padding-left:26px}li{padding:6px 0 6px 6px}code{font-size:13px;overflow-wrap:anywhere}.note{background:#e9f2ef;padding:20px 24px;border-left:3px solid var(--teal);border-radius:0 10px 10px 0}.note p:last-child{margin:0}details{padding:17px 0;border-bottom:1px solid var(--line)}summary{font-weight:600;cursor:pointer}details p{color:var(--muted);margin:12px 0 0}footer{margin-top:40px;color:var(--muted);font-size:13px}a:focus-visible,summary:focus-visible{outline:3px solid #44a7b0;outline-offset:5px}
+    @media(max-width:680px){main{padding:24px 20px 40px}header{padding-top:48px}.grid{grid-template-columns:1fr;gap:12px}section{padding:28px 0}.feature{padding:20px}}
+  </style>
+</head>
+<body>
+<main>
+  <nav><strong>快递短信助手</strong><a href="https://github.com/lsk-000478/parcel-sms-assistant">查看 GitHub 源码 ↗</a></nav>
+  <header>
+    <div class="eyebrow">MAC 应用 · v0.3.0</div>
+    <h1>取件码和配送状态，<br>在一个窗口里找。</h1>
+    <p>把已经收到的快递短信整理成清楚的包裹列表。查看取件码、配送通知，收货以后留下一份归档。</p>
+    <div class="actions">
+      <a class="button primary" href="https://github.com/lsk-000478/parcel-sms-assistant/releases/download/v0.3.0/ParcelSMSAssistant-0.3.0-arm64.zip">下载 Mac 安装包</a>
+      <a class="button" href="使用说明.docx" download>下载使用说明</a>
+    </div>
+    <div class="small">Apple Silicon（M 系列）· macOS 14+ · 临时签名，未经 Apple 公证<br>目前在 macOS 26 上实测，尚未覆盖全部系统版本和短信模板。</div>
+  </header>
+  <section aria-labelledby="features">
+    <h2 id="features">打开以后，先看这些</h2>
+    <div class="grid">
+      <article class="feature"><h3>取件与配送</h3><p>提取短信中已有的取件码、驿站、运单号和预计送达文字，按状态分栏显示。</p></article>
+      <article class="feature"><h3>购物平台提示</h3><p>短信明确提到购物平台时，显示平台名称和文字标识。没有依据时显示未知。</p></article>
+      <article class="feature"><h3>已收货归档</h3><p>签收短信可触发归档；没有短信时可以手动标记，并在误点后撤销。</p></article>
+    </div>
+  </section>
+  <section aria-labelledby="start">
+    <h2 id="start">首次使用</h2>
+    <ol>
+      <li>下载 ZIP 并解压，把「快递短信助手.app」拖到 Mac 的「应用程序」。</li>
+      <li>核对下载来源。若首次打开被拦截，按系统提示到「系统设置 → 隐私与安全性」选择「仍要打开」。</li>
+      <li>在 iPhone 和 Mac 的「信息」中使用同一个 Apple 账户，开启适用的短信转发设置，先验证新收到的普通短信能出现在 Mac 的「信息」里。</li>
+      <li>在「系统设置 → 隐私与安全性 → 完全磁盘访问权限」中允许「快递短信助手」，然后退出并重新打开应用。</li>
+      <li>点击开始读取／刷新。读取成功后每分钟刷新一次，应用需要保持运行。</li>
+    </ol>
+    <div class="note"><p>在购物平台点击「确认收货」后，如果没有签收短信，请在工具里点「标记已收货并归档」。应用无法感知其他软件里的点击。</p></div>
+  </section>
+  <section aria-labelledby="questions">
+    <h2 id="questions">使用前了解</h2>
+    <details open><summary>能看到所有购物订单吗？</summary><p>目前只整理已经进入 Mac「信息」的快递 SMS／RCS，没有连接购物平台订单库。短信没提供的商品名称、图片或预计到达时间不会自动补全。iMessage 不在当前读取范围。</p></details>
+    <details><summary>短信会上传到服务器或 AI 吗？</summary><p>工具的读取、识别和归档都在 Mac 本地执行，没有网络请求。iPhone 到 Mac 的转发使用 Apple 的系统功能和网络。这个网站只提供下载和说明，不读取短信。</p></details>
+    <details><summary>为什么需要完全磁盘访问权限？</summary><p>读取 Mac 本地的信息数据库需要系统授权。此系统权限范围较广，请只给信任的应用授权。项目以只读方式访问短信，不发送消息、不修改已读状态。</p></details>
+    <details><summary>归档保存在哪里？</summary><p>保存在 <code>~/Library/Application Support/ParcelSMSInbox/receipts.json</code>，包含相关原短信、发件人、运单号和时间。归档不是额外加密的数据库，当前没有自动清理或删除归档的界面。</p></details>
+  </section>
+  <footer>个人开发项目 · <a href="https://github.com/lsk-000478/parcel-sms-assistant/releases">版本与下载</a> · <a href="https://github.com/lsk-000478/parcel-sms-assistant/issues">反馈问题</a><br>请在反馈中隐藏姓名、地址、电话和取件码。</footer>
+</main>
+</body>
+</html>
