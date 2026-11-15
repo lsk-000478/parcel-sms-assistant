@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="在 Mac 本地整理快递短信，查看取件码、配送状态与收货归档。">
+  <meta name="description" content="在 Mac 本地整理快递短信，查看取件码、配送状态与收货归档，并查询附近纸箱回收点。">
   <title>快递短信助手 · Mac 下载与使用</title>
   <style>
     :root{color-scheme:light;--ink:#152b39;--muted:#52646c;--teal:#087d75;--line:#dbe5e7;--paper:#f4f7f6}
@@ -18,11 +18,11 @@
 <main>
   <nav><strong>快递短信助手</strong><a href="https://github.com/lsk-000478/parcel-sms-assistant">查看 GitHub 源码 ↗</a></nav>
   <header>
-    <div class="eyebrow">MAC 应用 · v0.3.1</div>
+    <div class="eyebrow">MAC 应用 · v0.4.0</div>
     <h1>取件码和配送状态，<br>在一个窗口里找。</h1>
-    <p>把已经收到的快递短信整理成清楚的包裹列表。查看取件码、配送通知，收货以后留下一份归档。</p>
+    <p>把已经收到的快递短信整理成清楚的包裹列表。查看取件码、配送通知，收货以后留下一份归档。新增纸箱回收，查找附近回收点并自行选择收购方。</p>
     <div class="actions">
-      <a class="button primary" href="https://github.com/lsk-000478/parcel-sms-assistant/releases/download/v0.3.1/ParcelSMSAssistant-0.3.1-arm64.zip">下载 Mac 安装包</a>
+      <a class="button primary" href="https://github.com/lsk-000478/parcel-sms-assistant/releases/download/v0.4.0/ParcelSMSAssistant-0.4.0-arm64.zip">下载 Mac 安装包</a>
       <a class="button" href="使用说明.docx" download>下载使用说明</a>
     </div>
     <div class="small">Apple Silicon（M 系列）· macOS 14+ · 临时签名，未经 Apple 公证<br>目前在 macOS 26 上实测，尚未覆盖全部系统版本和短信模板。</div>
@@ -33,7 +33,17 @@
       <article class="feature"><h3>取件与配送</h3><p>提取短信中已有的取件码、驿站、运单号和预计送达文字，按状态分栏显示。</p></article>
       <article class="feature"><h3>购物平台提示</h3><p>短信明确提到购物平台时，显示平台名称和文字标识。没有依据时显示未知。</p></article>
       <article class="feature"><h3>已收货归档</h3><p>签收短信可触发归档；没有短信时可以手动标记，并在误点后撤销。</p></article>
+      <article class="feature"><h3>附近纸箱回收</h3><p>输入地址或主动使用本次定位，按距离查看回收候选商户，选择并在本机保存收购方。</p></article>
     </div>
+  </section>
+  <section aria-labelledby="recycling">
+    <h2 id="recycling">纸箱回收怎么用</h2>
+    <ol>
+      <li>点击侧栏「纸箱回收」，输入城市、街道或附近地标，选择 3／5／10／20 公里后点击「查找回收点」。也可主动使用当前位置，手动地址不需要定位权限。</li>
+      <li>核对搜索中心，按直线距离浏览候选商户。点击商户查看地址、地图提供的电话或网站，并可在地图中查看。</li>
+      <li>点击「选择这家收购方」保存在本机。重启后可点「查看已选收购方」，也可取消或另选一家。</li>
+    </ol>
+    <div class="note"><p>地图资料未核实是否收纸箱、当前营业、价格或上门服务，请先联系确认。保存选择不代表预约。交付前去除面单上的姓名、地址和电话。只用回收查询时无需授予短信读取权限。</p></div>
   </section>
   <section aria-labelledby="start">
     <h2 id="start">首次使用</h2>
@@ -49,7 +59,7 @@
   <section aria-labelledby="questions">
     <h2 id="questions">使用前了解</h2>
     <details open><summary>能看到所有购物订单吗？</summary><p>目前只整理已经进入 Mac「信息」的快递 SMS／RCS／iMessage，没有连接购物平台订单库。短信没提供的商品名称、图片或预计到达时间不会自动补全。详情会显示消息类型。</p></details>
-    <details><summary>短信会上传到服务器或 AI 吗？</summary><p>工具的读取、识别和归档都在 Mac 本地执行，没有网络请求。iPhone 到 Mac 的转发使用 Apple 的系统功能和网络。这个网站只提供下载和说明，不读取短信。</p></details>
+    <details><summary>短信会上传到服务器或 AI 吗？</summary><p>短信的读取、识别和归档都在 Mac 本地执行，不上传短信。主动查询纸箱回收点时，地址或本次位置及回收关键词会发送到 Apple 地图服务，不发送短信或归档。iPhone 到 Mac 的转发使用 Apple 的系统功能和网络。这个网站只提供下载和说明，不读取短信。</p></details>
     <details><summary>为什么需要完全磁盘访问权限？</summary><p>读取 Mac 本地的信息数据库需要系统授权。此系统权限范围较广，请只给信任的应用授权。项目以只读方式访问短信，不发送消息、不修改已读状态。</p></details>
     <details><summary>归档保存在哪里？</summary><p>保存在 <code>~/Library/Application Support/ParcelSMSInbox/receipts.json</code>，包含相关原短信、发件人、运单号和时间。归档不是额外加密的数据库，当前没有自动清理或删除归档的界面。</p></details>
   </section>
