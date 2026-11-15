@@ -5,8 +5,9 @@
 <key>CFBundleIdentifier</key><string>local.parcel.sms.inbox</string>
 <key>CFBundleName</key><string>快递短信助手</string>
 <key>CFBundlePackageType</key><string>APPL</string>
-<key>CFBundleShortVersionString</key><string>0.3.1</string>
-<key>CFBundleVersion</key><string>4</string>
+<key>CFBundleShortVersionString</key><string>0.4.0</string>
+<key>CFBundleVersion</key><string>5</string>
+<key>NSLocationUsageDescription</key><string>仅在你点击使用当前位置时定位，用于向地图服务查询附近的纸箱回收候选商户。不上传短信内容；也可以手动输入地址。</string>
 <key>LSMinimumSystemVersion</key><string>14.0</string>
 <key>NSHighResolutionCapable</key><true/>
 </dict></plist>

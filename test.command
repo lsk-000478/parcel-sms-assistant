@@ -10,3 +10,5 @@ xcrun swiftc -module-cache-path "$BUILD_DIR/swift-cache" -import-objc-header Sou
 "$BUILD_DIR/tests/decoder"
 xcrun swiftc -module-cache-path "$BUILD_DIR/swift-cache" -import-objc-header Sources/LegacyText.h "$BUILD_DIR/tests/LegacyText.o" -parse-as-library Sources/Parcel.swift Sources/Inbox.swift Sources/BodyDecoder.swift Tests/InboxTests.swift -o "$BUILD_DIR/tests/inbox" -framework AppKit -lsqlite3
 "$BUILD_DIR/tests/inbox"
+xcrun swiftc -module-cache-path "$BUILD_DIR/swift-cache" -parse-as-library Sources/Recycling.swift Tests/RecyclingTests.swift -o "$BUILD_DIR/tests/recycling" -framework SwiftUI -framework MapKit -framework CoreLocation
+"$BUILD_DIR/tests/recycling"

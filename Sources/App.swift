@@ -30,6 +30,7 @@ struct PlatformBadge: View {
 
 struct ContentView: View {
     @StateObject private var store = InboxStore()
+    @StateObject private var recycling = RecyclingStore()
     @State private var filter = "进行中"
     @State private var query = ""
     @State private var selection: String?
@@ -46,7 +47,7 @@ struct ContentView: View {
             VStack(alignment:.leading,spacing:16) {
                 Label("快递短信助手",systemImage:"shippingbox.fill").font(.title2.bold()).padding(.top)
                 Text("支持短信、RCS 与 iMessage").foregroundStyle(.secondary).font(.caption)
-                ForEach(["进行中","待取件","配送到家","寄出 / 运输","已收货归档","全部通知"], id:\.self) { item in
+                ForEach(["进行中","待取件","配送到家","寄出 / 运输","已收货归档","全部通知","纸箱回收"], id:\.self) { item in
                     Button { filter=item; selection=nil } label: {
                         HStack { Text(item); Spacer(); if item == "已收货归档" { Text("\(store.parcels.filter { store.ledger.isReceived($0) }.count)") } else if item == "进行中" { Text("\(store.parcels.filter { !store.ledger.isReceived($0) }.count)") } }
                             .padding(10).background(filter == item ? Color.accentColor.opacity(0.16) : Color.clear).clipShape(RoundedRectangle(cornerRadius:8))
@@ -55,9 +56,10 @@ struct ContentView: View {
                 Spacer()
                 if let date=store.lastRefresh { Text("上次同步 \(date.formatted(date:.omitted,time:.shortened))").font(.caption).foregroundStyle(.secondary) }
                 Toggle("每分钟刷新",isOn:$store.autoRefresh).disabled(store.lastRefresh == nil)
-                Text("本机处理 · 无云端上传").font(.caption).foregroundStyle(.secondary)
+                Text("快递信息本机处理\n回收查询使用联网地图").font(.caption).foregroundStyle(.secondary)
             }.padding().frame(minWidth:190)
         } content: {
+            if filter == "纸箱回收" { RecyclingView(store:recycling) } else {
             VStack(spacing:0) {
                 HStack { TextField("搜索平台、运单或短信",text:$query).textFieldStyle(.roundedBorder); Button { Task { await store.refresh() } } label: { Image(systemName:"arrow.clockwise") }.disabled(store.busy) }.padding()
                 if store.busy { ProgressView("正在读取短信…").padding() }
@@ -76,8 +78,10 @@ struct ContentView: View {
                 if let archiveError=store.archiveError { Text(archiveError).font(.caption).foregroundStyle(.red).padding() }
                 Text(store.coverage).font(.caption2).foregroundStyle(.secondary).padding()
             }.navigationSplitViewColumnWidth(min:300,ideal:370)
+            }
         } detail: {
-            if let p=selected { ScrollView { VStack(alignment:.leading,spacing:20) {
+            if filter == "纸箱回收" { RecyclingDetailView(store:recycling) }
+            else if let p=selected { ScrollView { VStack(alignment:.leading,spacing:20) {
                 HStack { Image(systemName:"shippingbox").font(.largeTitle).foregroundStyle(color(p.latest.status)); VStack(alignment:.leading) { Text(p.latest.carrier).font(.title.bold()); Text(store.ledger.isReceived(p) ? "已收货" : p.latest.status.rawValue).foregroundStyle(color(p.latest.status)) } }
                 VStack(alignment:.leading,spacing:8) {
                     Text("购买平台").font(.caption).foregroundStyle(.secondary)
